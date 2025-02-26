@@ -128,6 +128,20 @@ public class BlockCipher {
         System.out.println("ECB Encrypted: "+byteHex(ecbEncrypt(plaintext)));
         System.out.println("CTR Encrypted: "+byteHex(ctrEncrypt(plaintext,iv)));
         System.out.println("CBC Encrypted: "+byteHex(cbcEncrypt(plaintext,iv)));
+
+        System.out.print("\n Would you like to enter more plaintext? (Y/N): ");
+        String answer=scan.nextLine();
+
+        switch(answer){
+            case "Y":
+            case "y":
+                main(args);
+            case "N":
+            case "n":
+                break;
+            default:
+                break;
+        }
        
         scan.close();
     }
