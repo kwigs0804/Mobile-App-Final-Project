@@ -30,8 +30,10 @@ class FavAdapter(
             }
 
             favButton.setOnClickListener {
-                val currentlyFav = event.favorite
-                event.favorite = !currentlyFav
+                val wasFav = event.favorite
+                val nowFav = !wasFav
+                event.favorite=nowFav
+
 
                 favButton.setImageResource(
                     if (event.favorite) {
@@ -40,6 +42,7 @@ class FavAdapter(
                         android.R.drawable.star_on
                     }
                 )
+                onFavClick(event,nowFav)
             }
         }
     }

@@ -28,7 +28,7 @@ class FavoriteActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        shared = getSharedPreferences("settings", MODE_PRIVATE)
+        shared = getSharedPreferences(FILE_NAME, MODE_PRIVATE)
         repo = FirestoreRepo()
 
         val recycle = findViewById<RecyclerView>(R.id.favRecycle)
@@ -37,22 +37,21 @@ class FavoriteActivity : AppCompatActivity() {
             val uid = FirebaseAuth.getInstance().currentUser?.uid
 
             if (favNow == true) {
-                if (uid != null) {
-                    repo.unFav(uid, event.id).addOnSuccessListener {
-                        Toast.makeText(this, "Removed: ${event.name}", Toast.LENGTH_SHORT).show()
-                        refresh()
+                    uid?.let{
+                        repo.unFav(it, event.id).addOnSuccessListener {
+                            refresh()
+                        }
                     }
-                }
             } else {
-                if (uid != null) {
-                    repo.addFav(uid, event).addOnSuccessListener {
-                        Toast.makeText(this, "Added: ${event.name}", Toast.LENGTH_SHORT).show()
-                        refresh()
+                    uid?.let{
+                        repo.addFav(it, event).addOnSuccessListener {
+                            refresh()
+                        }
                     }
-                }
             }
-            recycle.adapter=adapter
         }
+        recycle.adapter=adapter
+        refresh()
     }
 
     fun refresh() {
@@ -63,14 +62,20 @@ class FavoriteActivity : AppCompatActivity() {
         if (uid != null) {
             repo.loadFav(uid) { all ->
                 var list = all
-                if (homeCity?.isNotBlank() == true) {
-                    list = list.filter { it.city.equals(homeCity, true) }
-                    list = when (sort) {
+                if (homeCity?.isNotEmpty() == true) {
+                    val filtered = list.filter { it.city.equals(homeCity, true) }
+                    if(filtered.isNotEmpty()){
+                        list=filtered
+                    }else{
+                        list
+                    }
+
+                    when (sort) {
                         "date" -> list.sortedBy { it.date }
                         else -> list.sortedBy { it.name }
                     }
                 }
-                adapter.replace(list.toList())
+                adapter.replace(list)
             }
         }
     }
