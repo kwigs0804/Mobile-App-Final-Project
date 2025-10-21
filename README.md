@@ -1,1 +1,1 @@
-
+The user will be able to log in or browse as a guest. If the user is logged in, favorite upcoming events. The user must pick a category and enter the city they want to find events in. They can also view each event on Google Maps and get directions to the event venue. If they want to buy tickets, they can click the "Buy Tickets" button and will be redirected to the TicketMaster site. Logged in users can view their favorited events by clicking the star.
