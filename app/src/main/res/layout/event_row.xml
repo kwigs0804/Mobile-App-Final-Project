@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="413dp"
+        android:layout_height="507dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
+        app:cardCornerRadius="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/eventName"
+                android:layout_width="324dp"
+                android:layout_height="27dp"
+                android:layout_marginTop="16dp"
+                android:text="Event Name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@color/TicketMaster"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/eventPic"
+                app:layout_constraintTop_toBottomOf="@+id/eventPic" />
+
+            <ImageView
+                android:id="@+id/eventPic"
+                android:layout_width="296dp"
+                android:layout_height="213dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/eventVenue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Venue"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/eventName"
+                app:layout_constraintTop_toBottomOf="@+id/eventName" />
+
+            <TextView
+                android:id="@+id/eventAddy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Address"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@+id/eventVenue"
+                app:layout_constraintTop_toBottomOf="@+id/eventVenue" />
+
+            <TextView
+                android:id="@+id/eventDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Event Date"
+                android:textColor="@color/EventDate"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/eventAddy"
+                app:layout_constraintTop_toBottomOf="@+id/eventAddy" />
+
+            <Button
+                android:id="@+id/ticketButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="@color/TicketMaster"
+                android:text="Buy Tickets"
+                app:layout_constraintBottom_toBottomOf="@+id/mapButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/mapButton" />
+
+            <TextView
+                android:id="@+id/priceRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Price Range: $"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/EventDate"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/eventDate"
+                app:layout_constraintTop_toBottomOf="@+id/eventDate"
+                tools:visibility="invisible" />
+
+            <ImageButton
+                android:id="@+id/favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:background="@null"
+                app:layout_constraintStart_toStartOf="@+id/priceRange"
+                app:layout_constraintTop_toBottomOf="@+id/priceRange"
+                app:srcCompat="@android:drawable/star_off" />
+
+            <ImageButton
+                android:id="@+id/mapButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:background="@null"
+                app:layout_constraintBottom_toBottomOf="@+id/favorite"
+                app:layout_constraintStart_toEndOf="@+id/favorite"
+                app:layout_constraintTop_toTopOf="@+id/favorite"
+                app:srcCompat="@android:drawable/ic_dialog_map" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
