@@ -8,5 +8,7 @@ data class FavEventData(
     val address: String="",
     val city: String="",
     val imagesUrl: String="",
+    val pricing: String="",
+    val dateTime:String="",
     var favorite: Boolean=true
 )

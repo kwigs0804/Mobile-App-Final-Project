@@ -36,15 +36,11 @@ class FavoriteActivity : AppCompatActivity() {
         adapter = FavAdapter(mutableListOf()) { event, favNow ->
             val uid = FirebaseAuth.getInstance().currentUser?.uid
 
-            if (favNow == true) {
+            if (favNow == false) {
                     uid?.let{
                         repo.unFav(it, event.id).addOnSuccessListener {
-                            refresh()
-                        }
-                    }
-            } else {
-                    uid?.let{
-                        repo.addFav(it, event).addOnSuccessListener {
+                            Toast.makeText(this,"Removed: ${event.name}",Toast.LENGTH_SHORT).show()
+                            adapter.remove(event.id)
                             refresh()
                         }
                     }

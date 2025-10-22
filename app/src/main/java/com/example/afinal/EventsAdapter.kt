@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
@@ -15,9 +16,11 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -44,27 +47,34 @@ class EventsAdapter(private val events: ArrayList<Events>, private val context: 
         val purchase=itemView.findViewById<Button>(R.id.ticketButton)
         val favButton=itemView.findViewById<ImageButton>(R.id.favorite)
 
-        init{
-            purchase.setOnClickListener{
-                val intent=Intent(Intent.ACTION_VIEW)
-                intent.data= Uri.parse(events[adapterPosition].url)
+        init {
+            purchase.setOnClickListener {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(events[adapterPosition].url)
                 context.startActivity(intent)
             }
+            val user=FirebaseAuth.getInstance().currentUser
+            if(user==null){
+                favButton.isEnabled=false
+            }else{
+                favButton.isEnabled=true
+                favButton.setOnClickListener {
+                    val position = adapterPosition
+                        .takeIf { it != RecyclerView.NO_POSITION }
+                    val event = events[position!!]
+                    val favNow = favID.contains(event.id)
 
-            favButton.setOnClickListener {
-                val position=adapterPosition
-                    .takeIf{it != RecyclerView.NO_POSITION}
-                val event=events[position!!]
-                val favNow=favID.contains(event.id)
-
-                if(favNow==true){
-                    buttonImage=android.R.drawable.star_off
-                }else{
-                    buttonImage=android.R.drawable.star_on
+                    if (favNow == true) {
+                        buttonImage = android.R.drawable.star_off
+                        Toast.makeText(context, "Removed: ${event.name}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        buttonImage = android.R.drawable.star_on
+                        Toast.makeText(context, "Added: ${event.name}", Toast.LENGTH_SHORT).show()
+                    }
+                    favButton.setImageResource(buttonImage!!)
+                    favClick?.invoke(event, favNow)
                 }
-                favButton.setImageResource(buttonImage!!)
-                favClick?.invoke(event,favNow)
-            }
+                }
         }
         fun mapping(event:Events){
             val map=itemView.findViewById<ImageButton>(R.id.mapButton)
@@ -138,7 +148,7 @@ class EventsAdapter(private val events: ArrayList<Events>, private val context: 
         val minCost= currentItem.priceRanges?.get(0)?.min
         val maxCost= currentItem.priceRanges?.get(0)?.max
         if(currentItem.priceRanges.isNullOrEmpty() || maxCost?.toInt()==0){
-            holder.price.visibility= INVISIBLE
+            holder.price.visibility= GONE
             Log.d(TAG, "onBindViewHolder: ${currentItem.priceRanges}")
         }else if(!currentItem.priceRanges.isNullOrEmpty() && minCost!=maxCost){
             holder.price.visibility=VISIBLE

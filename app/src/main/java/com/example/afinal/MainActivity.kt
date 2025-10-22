@@ -2,9 +2,11 @@ package com.example.afinal
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.AdapterView
@@ -15,6 +17,7 @@ import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +28,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 private const val TAG="EventFragment"
 private const val API_KEY="StGgQ7Xcyt48ukakiENXFpT4eqXVRhmE"
@@ -41,6 +47,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private var itemSelected: Boolean=false
     private var signedOut: Boolean=false
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +70,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         val favList=findViewById<ImageButton>(R.id.favList)
         val signOut=findViewById<Button>(R.id.signOut)
         val guest=intent.getBooleanExtra("guest", false)
+        val favButton=findViewById<ImageButton>(R.id.favorite)
 
         if(FirebaseAuth.getInstance().currentUser==null){
             signedOut=true
@@ -98,7 +106,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
             val ticketmasterAPI = retrofit.create(TicketMaster::class.java)
-            ticketmasterAPI.getEvents(API_KEY, keyword,city.text.toString(), "date,asc", 20)
+            ticketmasterAPI.getEvents(API_KEY, keyword,city.text.toString(), "date,asc")
                 .enqueue(object : Callback<EventData> {
                     override fun onResponse(call: Call<EventData>, response: Response<EventData>) {
                         val body = response.body()
@@ -165,6 +173,19 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
         return true
     }
+
+    override fun onResume(){
+        super.onResume()
+        val uid=auth.currentUser?.uid
+        if (uid != null) {
+            repo.loadFav(uid){favs->
+                favID.clear()
+                favID.addAll(favs.map{it.id})
+                eventAdapter.setFavorites(favID)
+            }
+        }
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
     fun setUp(){
         eventAdapter=EventsAdapter(eventList,this)
         recyclerView.adapter=eventAdapter
@@ -188,7 +209,47 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                         }
                 }
             }else{
-                val fav= FavEventData(event.id,event.name, event.dates.start.localDate, event._embedded.venues[0].name, event._embedded.venues[0].address.line1, event._embedded.venues[0].city.name, event.images.maxByOrNull{it.width*it.height}?.url.toString(), true)
+                val price=event.priceRanges?.firstOrNull()
+                val min=price?.min
+                val max=price?.max
+                var pricing=""
+                val dateForm= DateTimeFormatter.ofPattern("MMMM dd, yyyy")
+                val timeForm= DateTimeFormatter.ofPattern("hh:mm a")
+                val start=event.dates.start
+                var dateTime: String? =null
+
+                if(max==0.0 || (min==null && max==null)){
+                    pricing=""
+                }else if(max==min){
+                    pricing="Starting Price: $${"%.2f".format(min)}"
+                }else{
+                    pricing="Price Range: $${"%.2f".format(min)} - $${"%.2f".format(max)}"
+                }
+
+                if(start.localTime?.isNotEmpty() == true && start.localDate.isNotEmpty()){
+                    val eventDate=LocalDate.parse(start.localDate).format(dateForm)
+                    val eventTime=LocalTime.parse(start.localTime).format(timeForm)
+
+                    dateTime="Date: $eventDate @ $eventTime"
+                }else if(start.localTime?.isEmpty() == true && start.localDate.isNotEmpty()){
+                    val eventDate=LocalDate.parse(start.localDate).format(dateForm)
+
+                    dateTime="Date: $eventDate @ TBD"
+                }else{
+                    dateTime="TBD"
+                }
+
+                val fav= FavEventData(
+                    event.id,
+                    event.name,
+                    start.localDate,
+                    "${event._embedded.venues[0].name}",
+                    "${event._embedded.venues[0].address.line1}, ${event._embedded.venues[0].city.name}, ${event._embedded.venues[0].state.name}",
+                    event._embedded.venues[0].city.name,
+                    event.images.maxByOrNull{it.width*it.height}?.url.toString(),
+                    pricing,
+                    dateTime,
+                    true)
                 if (uid != null) {
                     repo.addFav(uid, fav)
                         .addOnSuccessListener{

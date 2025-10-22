@@ -2,10 +2,15 @@ package com.example.afinal
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.google.android.gms.maps.model.VisibleRegion
 
 class FavAdapter(
     private var items: MutableList<FavEventData>,
@@ -15,11 +20,17 @@ class FavAdapter(
     inner class FavViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val eventName = itemView.findViewById<TextView>(R.id.eventName)
         private val eventVenue = itemView.findViewById<TextView>(R.id.eventVenue)
+        private val eventDate=itemView.findViewById<TextView>(R.id.eventDate)
         private val favButton = itemView.findViewById<ImageButton>(R.id.favorite)
+        private val image=itemView.findViewById<ImageView>(R.id.eventPic)
+        private val eventAddress=itemView.findViewById<TextView>(R.id.eventAddy)
+        private val price=itemView.findViewById<TextView>(R.id.priceRange)
 
         fun bind(event: FavEventData) {
             eventName.text = event.name
             eventVenue.text = event.venue
+            eventAddress.text=event.address
+            eventDate.text=event.dateTime
 
             favButton.background = null
 
@@ -27,6 +38,21 @@ class FavAdapter(
                 favButton.setImageResource(android.R.drawable.star_on)
             } else {
                 favButton.setImageResource(android.R.drawable.star_off)
+            }
+
+            if(event.imagesUrl.isNotEmpty()){
+                Glide.with(itemView)
+                    .load(event.imagesUrl)
+                    .into(image)
+            }else{
+                image.setImageResource(R.drawable.img)
+            }
+
+            if(event.pricing.isNotEmpty()){
+                price.visibility=VISIBLE
+                price.text=event.pricing
+            }else{
+                price.visibility= GONE
             }
 
             favButton.setOnClickListener {
@@ -63,5 +89,12 @@ class FavAdapter(
         items.clear()
         items.addAll(newList)
         notifyDataSetChanged()
+    }
+    fun remove(id:String){
+        val id=items.indexOfFirst { it.id == id}
+        if(id >=0){
+            items.removeAt(id)
+            notifyItemRemoved(id)
+        }
     }
 }

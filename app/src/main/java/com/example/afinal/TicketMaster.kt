@@ -10,7 +10,6 @@ interface TicketMaster {
         @Query("apikey") apiKey:String,
         @Query("keyword") keyword: String,
         @Query("city") city: String,
-        @Query("sort") sort: String,
-        @Query("size") size: Int
+        @Query("sort") sort: String
     ): Call<EventData>
 }
