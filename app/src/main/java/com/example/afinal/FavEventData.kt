@@ -10,6 +10,7 @@ data class FavEventData(
     val imagesUrl: String="",
     val pricing: String="",
     val dateTime:String="",
+    val url:String="",
     var favorite: Boolean=true,
     val lat: String?="",
     val lon: String?=""

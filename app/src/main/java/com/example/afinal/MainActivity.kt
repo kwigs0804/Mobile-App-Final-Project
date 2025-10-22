@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
             val ticketmasterAPI = retrofit.create(TicketMaster::class.java)
-            ticketmasterAPI.getEvents(API_KEY, keyword,city.text.toString(), "date,asc")
+            ticketmasterAPI.getEvents(API_KEY, keyword,city.text.toString(), "date,asc",50)
                 .enqueue(object : Callback<EventData> {
                     override fun onResponse(call: Call<EventData>, response: Response<EventData>) {
                         val body = response.body()
@@ -251,6 +251,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     event.images.maxByOrNull{it.width*it.height}?.url.toString(),
                     pricing,
                     dateTime,
+                    event.url,
                     true,
                     lat,
                     lon

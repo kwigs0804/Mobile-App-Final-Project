@@ -10,6 +10,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -30,6 +31,7 @@ class FavAdapter(private var items: MutableList<FavEventData>, private val onFav
         private val eventAddress=itemView.findViewById<TextView>(R.id.eventAddy)
         private val price=itemView.findViewById<TextView>(R.id.priceRange)
         val maps=itemView.findViewById<ImageView>(R.id.mapButton)
+        val purchase=itemView.findViewById<Button>(R.id.ticketButton)
 
         fun bind(event: FavEventData) {
             eventName.text = event.name
@@ -37,8 +39,13 @@ class FavAdapter(private var items: MutableList<FavEventData>, private val onFav
             eventAddress.text = event.address
             eventDate.text = event.dateTime
 
-            favButton.background = null
+            purchase.setOnClickListener {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(items[adapterPosition].url)
+                itemView.context.startActivity(intent)
+            }
 
+            favButton.background = null
             if (event.favorite) {
                 favButton.setImageResource(android.R.drawable.star_on)
             } else {
