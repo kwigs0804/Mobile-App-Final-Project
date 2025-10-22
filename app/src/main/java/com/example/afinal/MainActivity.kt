@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
             val ticketmasterAPI = retrofit.create(TicketMaster::class.java)
-            ticketmasterAPI.getEvents(API_KEY, keyword,city.text.toString(), "date,asc",50)
+            ticketmasterAPI.getEvents(API_KEY, keyword,city.text.toString(), "date,asc")
                 .enqueue(object : Callback<EventData> {
                     override fun onResponse(call: Call<EventData>, response: Response<EventData>) {
                         val body = response.body()
