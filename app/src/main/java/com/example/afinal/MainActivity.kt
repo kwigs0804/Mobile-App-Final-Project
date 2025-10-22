@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.AdapterView
@@ -218,6 +217,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 val timeForm= DateTimeFormatter.ofPattern("hh:mm a")
                 val start=event.dates.start
                 var dateTime: String? =null
+                val lat= event._embedded.venues[0].location.lat
+                val lon= event._embedded.venues[0].location.lon
 
                 if(max==0.0 || (min==null && max==null)){
                     pricing=""
@@ -250,7 +251,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     event.images.maxByOrNull{it.width*it.height}?.url.toString(),
                     pricing,
                     dateTime,
-                    true)
+                    true,
+                    lat,
+                    lon
+                )
                 if (uid != null) {
                     repo.addFav(uid, fav)
                         .addOnSuccessListener{

@@ -1,5 +1,10 @@
 package com.example.afinal
 
+import android.content.Context
+import android.content.Intent
+import android.media.metrics.Event
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -8,14 +13,13 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.gms.maps.model.VisibleRegion
 
-class FavAdapter(
-    private var items: MutableList<FavEventData>,
-    private val onFavClick: (FavEventData, Any?) -> Unit
-) : RecyclerView.Adapter<FavAdapter.FavViewHolder>() {
+private const val TAG = "FavAdapter"
+class FavAdapter(private var items: MutableList<FavEventData>, private val onFavClick: (FavEventData, Any?) -> Unit) : RecyclerView.Adapter<FavAdapter.FavViewHolder>() {
 
     inner class FavViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val eventName = itemView.findViewById<TextView>(R.id.eventName)
@@ -25,12 +29,13 @@ class FavAdapter(
         private val image=itemView.findViewById<ImageView>(R.id.eventPic)
         private val eventAddress=itemView.findViewById<TextView>(R.id.eventAddy)
         private val price=itemView.findViewById<TextView>(R.id.priceRange)
+        val maps=itemView.findViewById<ImageView>(R.id.mapButton)
 
         fun bind(event: FavEventData) {
             eventName.text = event.name
             eventVenue.text = event.venue
-            eventAddress.text=event.address
-            eventDate.text=event.dateTime
+            eventAddress.text = event.address
+            eventDate.text = event.dateTime
 
             favButton.background = null
 
@@ -40,35 +45,53 @@ class FavAdapter(
                 favButton.setImageResource(android.R.drawable.star_off)
             }
 
-            if(event.imagesUrl.isNotEmpty()){
+            if (event.imagesUrl.isNotEmpty()) {
                 Glide.with(itemView)
                     .load(event.imagesUrl)
                     .into(image)
-            }else{
+            } else {
                 image.setImageResource(R.drawable.img)
             }
 
-            if(event.pricing.isNotEmpty()){
-                price.visibility=VISIBLE
-                price.text=event.pricing
-            }else{
-                price.visibility= GONE
+            if (event.pricing.isNotEmpty()) {
+                price.visibility = VISIBLE
+                price.text = event.pricing
+            } else {
+                price.visibility = GONE
             }
 
             favButton.setOnClickListener {
                 val wasFav = event.favorite
                 val nowFav = !wasFav
-                event.favorite=nowFav
+                event.favorite = nowFav
 
 
                 favButton.setImageResource(
                     if (event.favorite) {
                         android.R.drawable.star_off
-                    } else{
+                    } else {
                         android.R.drawable.star_on
                     }
                 )
-                onFavClick(event,nowFav)
+                onFavClick(event, nowFav)
+
+            }
+            val name=event.name
+            val lat = event.lat?.toDoubleOrNull()
+            val lon = event.lon?.toDoubleOrNull()
+
+            maps.setOnClickListener {
+                Log.d(TAG, "bind: ${lat} ${lon}")
+                if (lat==null || lon==null) {
+                    return@setOnClickListener
+                }
+                val intent=Intent(itemView.context,MapsActivity::class.java).apply{
+                    putExtra("lat",lat)
+                    putExtra("lon", lon)
+                    putExtra("name",name)
+                }
+                Log.d(TAG, "bind: ${lat} ${lon}")
+                itemView.context.startActivity(intent)
             }
         }
     }
@@ -80,7 +103,8 @@ class FavAdapter(
     }
 
     override fun onBindViewHolder(holder: FavViewHolder, position: Int) {
-        holder.bind(items[position])
+        val event=items[position]
+        holder.bind(event)
     }
 
     override fun getItemCount(): Int = items.size
@@ -97,4 +121,5 @@ class FavAdapter(
             notifyItemRemoved(id)
         }
     }
+
 }
