@@ -2,6 +2,7 @@ package com.example.afinal
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private val favID= mutableSetOf<String>()
     private var itemSelected: Boolean=false
     private var signedOut: Boolean=false
+    private lateinit var shared: SharedPreferences
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
@@ -68,8 +70,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         spinner.onItemSelectedListener=this
         val search=findViewById<Button>(R.id.searchButton)
         val favList=findViewById<ImageButton>(R.id.favList)
-        val signOut=findViewById<Button>(R.id.signOut)
         val guest=intent.getBooleanExtra("guest", false)
+        val settings=findViewById<ImageButton>(R.id.settingsButton)
         val favButton=findViewById<ImageButton>(R.id.favorite)
 
         if(FirebaseAuth.getInstance().currentUser==null){
@@ -78,19 +80,16 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         if(guest==true || signedOut==true){
             favList.isEnabled=false
             favList.alpha=0.38f
-            signOut.isEnabled=false
-            signOut.setBackgroundColor(com.google.android.material.R.dimen.material_emphasis_disabled)
-        }
-
-        signOut.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, HeroActivity::class.java)
-            intent.flags =Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
+            settings.isEnabled=false
+            settings.alpha=0.38f
         }
 
         favList.setOnClickListener{
             val intent= Intent(this, FavoriteActivity::class.java)
+            startActivity(intent)
+        }
+        settings.setOnClickListener {
+            val intent= Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
 
@@ -139,6 +138,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 }
                 )
         }
+
+
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {

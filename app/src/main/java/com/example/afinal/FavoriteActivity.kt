@@ -17,6 +17,7 @@ class FavoriteActivity : AppCompatActivity() {
     private lateinit var adapter: FavAdapter
     private lateinit var shared: SharedPreferences
     private val FILE_NAME = "settings"
+    private var sort:String?="date"
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +29,7 @@ class FavoriteActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        shared = getSharedPreferences(FILE_NAME, MODE_PRIVATE)
+        shared=getSharedPreferences("settings", MODE_PRIVATE)
         repo = FirestoreRepo()
 
         val recycle = findViewById<RecyclerView>(R.id.favRecycle)
@@ -52,24 +53,15 @@ class FavoriteActivity : AppCompatActivity() {
 
     fun refresh() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid
-        val homeCity = shared.getString("homeCity", "")
-        val sort = shared.getString("sortBy", "name")
+        sort= shared.getString("sort","date")
 
         if (uid != null) {
             repo.loadFav(uid) { all ->
                 var list = all
-                if (homeCity?.isNotEmpty() == true) {
-                    val filtered = list.filter { it.city.equals(homeCity, true) }
-                    if(filtered.isNotEmpty()){
-                        list=filtered
-                    }else{
-                        list
-                    }
+                list = when (sort) {
+                    "name" -> list.sortedBy { it.name }
+                    else -> list.sortedBy { it.date }
 
-                    when (sort) {
-                        "date" -> list.sortedBy { it.date }
-                        else -> list.sortedBy { it.name }
-                    }
                 }
                 adapter.replace(list)
             }
