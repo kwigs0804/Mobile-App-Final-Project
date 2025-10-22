@@ -30,6 +30,7 @@ private const val TAG = "HeroActivity"
 class HeroActivity : AppCompatActivity() {
     private lateinit var loginButton:Button
     private lateinit var crowdSound: MediaPlayer
+    var signedOut:Boolean=false
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,9 +64,13 @@ class HeroActivity : AppCompatActivity() {
     }
     override fun onStart() {
         super.onStart()
-        crowdSound=MediaPlayer.create(this, R.raw.crowd)
-        crowdSound.isLooping=false
-        crowdSound.start()
+        crowdSound = MediaPlayer.create(this, R.raw.crowd)
+        if(intent.getBooleanExtra("STOP_SOUND",signedOut)==true){
+            crowdSound.stop()
+            crowdSound.release()
+        }else {
+            crowdSound.isLooping = false
+            crowdSound.start()
+        }
     }
-
 }

@@ -36,9 +36,10 @@ class SettingsActivity : AppCompatActivity() {
         signOut=findViewById(R.id.signout)
 
         signOut.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, HeroActivity::class.java)
+            intent.putExtra("STOP_SOUND",true)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+            FirebaseAuth.getInstance().signOut()
             startActivity(intent)
         }
 
